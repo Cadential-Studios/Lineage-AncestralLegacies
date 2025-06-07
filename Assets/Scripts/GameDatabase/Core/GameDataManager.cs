@@ -30,6 +30,7 @@ namespace Lineage.Core
         }
 
         private Dictionary<string, GameDataSO> _dataByID = new Dictionary<string, GameDataSO>();
+        private Dictionary<string, Tag_SO> _tagsByName = new Dictionary<string, Tag_SO>();
 
         private void Awake()
         {
@@ -48,6 +49,8 @@ namespace Lineage.Core
         private void LoadAllData()
         {
             _dataByID.Clear();
+            _tagsByName.Clear();
+
             var allData = Resources.LoadAll<GameDataSO>("GameData");
             foreach (var data in allData)
             {
@@ -57,6 +60,16 @@ namespace Lineage.Core
                         _dataByID.Add(data.uniqueID, data);
                     else
                         Debug.LogWarning($"Duplicate GameData uniqueID {data.uniqueID} detected.");
+                }
+            }
+
+            var allTags = Resources.LoadAll<Tag_SO>("GameData");
+            foreach (var tag in allTags)
+            {
+                if (tag != null && !string.IsNullOrEmpty(tag.tagName))
+                {
+                    if (!_tagsByName.ContainsKey(tag.tagName))
+                        _tagsByName.Add(tag.tagName, tag);
                 }
             }
         }
@@ -70,6 +83,19 @@ namespace Lineage.Core
             return null;
         }
 
+        public EntityDefinitionSO GetEntityDefinition(string id) => GetDefinition<EntityDefinitionSO>(id);
+        public ItemDefinitionSO GetItemDefinition(string id) => GetDefinition<ItemDefinitionSO>(id);
+        public RecipeDefinitionSO GetRecipeDefinition(string id) => GetDefinition<RecipeDefinitionSO>(id);
+
+        public Tag_SO GetTagDefinition(string tagName)
+        {
+            if (_tagsByName.TryGetValue(tagName, out var tag))
+            {
+                return tag;
+            }
+            return null;
+        }
+
         public List<T> GetAllDefinitionsOfType<T>() where T : GameDataSO
         {
             return _dataByID.Values.OfType<T>().ToList();
@@ -78,6 +104,13 @@ namespace Lineage.Core
         public List<T> GetDefinitionsWithTag<T>(Tag_SO tag) where T : GameDataSO
         {
             return _dataByID.Values.OfType<T>().Where(d => d.tags.Contains(tag)).ToList();
+        }
+
+        public List<T> GetDefinitionsWithTags<T>(List<Tag_SO> tags, bool matchAll = true) where T : GameDataSO
+        {
+            return _dataByID.Values.OfType<T>().Where(d =>
+                matchAll ? tags.All(t => d.tags.Contains(t)) : tags.Any(t => d.tags.Contains(t))
+            ).ToList();
         }
     }
 }
