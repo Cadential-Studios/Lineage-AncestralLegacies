@@ -264,7 +264,7 @@ namespace Lineage.Database
     // - ProgressBar (UI representation for tasks or loading screens) using a sprite with a fill setting
     #endregion
 
-    #region Game Data Structures
+#region Game Data Structures
 
     /// <summary>
     /// Represents data for a living entity in the game.
@@ -1582,5 +1582,5 @@ namespace Lineage.Database
     }
 
     // Todo: Consider adding Dialogue system, Weather system, Economy system, and Territory management structures.
-
+    #endregion
 }
