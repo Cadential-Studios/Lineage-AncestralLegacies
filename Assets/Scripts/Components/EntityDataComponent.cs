@@ -1,7 +1,9 @@
+
 using UnityEngine;
 using System.Collections.Generic;
 using Lineage.Database;
 using UnityEditor.EditorTools;
+using Lineage.Debug;
 
 namespace Lineage.Components
 {
@@ -81,7 +83,7 @@ namespace Lineage.Components
         {
             if (!isInitialized)
             {
-                UnityEngine.Debug.LogWarning($"{gameObject.name} EntityDataComponent is not initialized!", this);
+                Log.Warning($"{gameObject.name} EntityDataComponent is not initialized!", Log.LogCategory.General, this);
             }
         }
         
@@ -124,7 +126,7 @@ namespace Lineage.Components
 
 
                 default:
-                    UnityEngine.Debug.LogWarning($"Stat {statID} not found in EntityData");
+                    Log.Warning($"Stat {statID} not found in EntityData", Log.LogCategory.General, this);
                     return new Stat(statID, statID.ToString(), 0f);
             }
         }
@@ -168,7 +170,7 @@ namespace Lineage.Components
                     entityData.level = Mathf.RoundToInt(entityData.levelStat.currentValue);
                     break;
                 default:
-                    UnityEngine.Debug.LogWarning($"Cannot modify unknown stat: {statID}");
+                    Log.Warning($"Cannot modify unknown stat: {statID}", Log.LogCategory.General, this);
                     break;
             }
             
