@@ -2,7 +2,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Lineage.Database;
-using UnityEditor.EditorTools;
 using Lineage.Debug;
 
 namespace Lineage.Components
@@ -16,79 +15,67 @@ namespace Lineage.Components
         [Header("Entity Data")]
         [SerializeField] private Entity _entityData;
 
-        [Header("Identity")]
-        [SerializeField] private string _entityName = "Unknown Entity";
-        [SerializeField] private int _entityID = 0;
-        [SerializeField] private int _entityAge = 0; // Placeholder for age tracking
-
-        [Header("Base Stats")]
-        [SerializeField] private float _entityHunger = 50f; // Default starting hunger
-        [SerializeField] private float _entityThirst = 50f; // Default starting thirst
-        [SerializeField] private float _entityEnergy = 50f; // Default starting energy
-        [SerializeField] private float _entitySpeed = 5f; // Default speed
-        [SerializeField] private float _entityHealth = 100f; // Default health
-        [SerializeField] private float _entityMana = 50f; // Default mana
-
-        [Header("Max Stat Values")]
-        [SerializeField] private float _entityMaxHunger = 100f; // Default max hunger
-        [SerializeField] private float _entityMaxThirst = 100f; // Default max thirst
-        [SerializeField] private float _entityMaxEnergy = 100f; // Default max energy
-        [SerializeField] private float _entityMaxSpeed = 10f; // Default max speed
-        [SerializeField] private float _entityMaxHealth = 100f; // Default max health
-        [SerializeField] private float _entityMaxMana = 100f; // Default max mana
-
-        [Header("Ability Stats")]
-        [SerializeField] private float _entityStrength = 10f; // Default strength
-        [SerializeField] private float _entityAgility = 10f; // Default agility
-        [SerializeField] private float _entityIntelligence = 10f; // Default intelligence
-        [SerializeField] private float _entityDefense = 10f; // Default defense
-        [SerializeField] private float _entityLuck = 5f; // Default luck
-        [SerializeField] private float _entityCharisma = 5f; // Default charisma
-
-        [Header("Combat Stats")]
-        [Tooltip("These stats are used for combat calculations and can be modified by buffs or equipment. Found in EntityData.")]
-        
-        [SerializeField] private float _entityAttack = 10f; // Default attack
-        [SerializeField] private float _entityMagicPower = 10f; // Default magic power
-        [SerializeField] private float _entityMagicDefense = 10f; // Default magic defense
-        [SerializeField] private float _entityCriticalHitChance = 5f; // Default critical hit chance
-        [SerializeField] private float _entityCriticalHitDamage = 150f; // Default critical hit damage
-
-        [Header("Traits")]
-        [SerializeField] private List<string> _entityTraits = new List<string>(); // Traits that modify stats or abilities
-        
-        [Header("Crafting")]
-        [SerializeField] private bool _entitycanCraft = false; // Can this entity craft items?
-        [SerializeField] private List<string> _craftingRecipes = new List<string>(); // List of available crafting recipes
         [Header("Runtime State")]
-        public bool isInitialized = false;
+        private bool _isInitialized;
         
         // Properties for easy access
-        public Entity EntityData 
-        { 
-            get => _entityData; 
-            set 
-            { 
-                _entityData = value; 
-                isInitialized = true;
-                OnEntityDataChanged?.Invoke(_entityData);
-            } 
-        }
-        
-        // Events for when entity data changes
-        public System.Action<Entity> OnEntityDataChanged;
-        public System.Action<Stat.ID, float> OnStatChanged;
-        public System.Action<State.ID> OnStateChanged;
-          private void Start()
+        /// <summary>
+        /// Entity data backing this component.
+        /// Setting this initializes the component and notifies listeners.
+        /// </summary>
+        public Entity EntityData
         {
-            if (!isInitialized)
+            get => _entityData;
+            set
+            {
+                _entityData = value;
+                _isInitialized = true;
+                EntityDataChanged?.Invoke(_entityData);
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the component has been initialized with entity data.
+        /// </summary>
+        public bool IsInitialized => _isInitialized;
+
+        /// <summary>
+        /// Event invoked when the entity data changes.
+        /// </summary>
+        public event System.Action<Entity> EntityDataChanged;
+
+        /// <summary>
+        /// Event invoked when a stat is modified.
+        /// </summary>
+        public event System.Action<Stat.ID, float> StatChanged;
+
+        /// <summary>
+        /// Event invoked when the entity state changes.
+        /// </summary>
+        public event System.Action<State.ID> StateChanged;
+
+        /// <summary>
+        /// Event invoked when needs reach critical levels.
+        /// </summary>
+        public event System.Action CriticalNeeds;
+
+        private void Start()
+        {
+            if (!_isInitialized)
             {
                 Log.Warning($"{gameObject.name} EntityDataComponent is not initialized!", Log.LogCategory.General, this);
             }
         }
-        
-        
-        
+
+        /// <summary>
+        /// Ensures the component has been initialized before use.
+        /// </summary>
+        private bool EnsureInitialized()
+        {
+            if (_isInitialized) return true;
+            Log.Warning($"{gameObject.name} EntityDataComponent accessed before initialization!", Log.LogCategory.General, this);
+            return false;
+        }
         #region Stat Management
 
         /// <summary>
@@ -96,10 +83,13 @@ namespace Lineage.Components
         /// </summary>
         public Stat GetStat(Stat.ID statID)
         {
+            if (!EnsureInitialized())
+            {
+                return new Stat(statID, statID.ToString(), 0f);
+            }
+
             switch (statID)
             {
-                // Get all the stats from EntityData and return them.
-
                 case Stat.ID.Health: return new Stat(Stat.ID.Health, "Health", _entityData.health.current);
                 case Stat.ID.Mana: return _entityData.mana;
                 case Stat.ID.Stamina: return _entityData.stamina;
@@ -123,8 +113,6 @@ namespace Lineage.Components
                 // Experience and Level stats
                 case Stat.ID.Experience: return _entityData.experience;
                 case Stat.ID.Level: return _entityData.levelStat;
-
-
                 default:
                     Log.Warning($"Stat {statID} not found in EntityData", Log.LogCategory.General, this);
                     return new Stat(statID, statID.ToString(), 0f);
@@ -136,13 +124,17 @@ namespace Lineage.Components
         /// </summary>
         public void ModifyStat(Stat.ID statID, float amount)
         {
+            if (!EnsureInitialized())
+            {
+                return;
+            }
+
             var entityData = _entityData;
-            
+
             switch (statID)
             {
-                case Stat.ID.Health: 
-                    if (amount > 0) entityData.health = entityData.health.Heal(amount);
-                    else entityData.health = entityData.health.TakeDamage(-amount);
+                case Stat.ID.Health:
+                    entityData.health = amount > 0 ? entityData.health.Heal(amount) : entityData.health.TakeDamage(-amount);
                     break;
                 case Stat.ID.Mana: entityData.mana.ModifyStat(amount); break;
                 case Stat.ID.Stamina: entityData.stamina.ModifyStat(amount); break;
@@ -156,7 +148,8 @@ namespace Lineage.Components
                 case Stat.ID.MagicDefense: entityData.magicDefense.ModifyStat(amount); break;
                 case Stat.ID.CriticalHitChance: entityData.criticalHitChance.ModifyStat(amount); break;
                 case Stat.ID.CriticalHitDamage: entityData.criticalHitDamage.ModifyStat(amount); break;
-                case Stat.ID.Luck: entityData.luck.ModifyStat(amount); break;                case Stat.ID.Charisma: entityData.charisma.ModifyStat(amount); break;
+                case Stat.ID.Luck: entityData.luck.ModifyStat(amount); break;
+                case Stat.ID.Charisma: entityData.charisma.ModifyStat(amount); break;
                 // Needs system stats
                 case Stat.ID.Hunger: entityData.hunger.ModifyStat(amount); break;
                 case Stat.ID.Thirst: entityData.thirst.ModifyStat(amount); break;
@@ -164,18 +157,17 @@ namespace Lineage.Components
                 case Stat.ID.Rest: entityData.rest.ModifyStat(amount); break;
                 // Experience and Level stats
                 case Stat.ID.Experience: entityData.experience.ModifyStat(amount); break;
-                case Stat.ID.Level: 
-                    entityData.levelStat.ModifyStat(amount); 
-                    // Also update the int level field to keep them in sync
+                case Stat.ID.Level:
+                    entityData.levelStat.ModifyStat(amount);
                     entityData.level = Mathf.RoundToInt(entityData.levelStat.currentValue);
                     break;
                 default:
                     Log.Warning($"Cannot modify unknown stat: {statID}", Log.LogCategory.General, this);
                     break;
             }
-            
+
             _entityData = entityData;
-            OnStatChanged?.Invoke(statID, amount);
+            StatChanged?.Invoke(statID, amount);
         }
         
         #endregion
@@ -187,11 +179,16 @@ namespace Lineage.Components
         /// </summary>
         public bool ChangeState(State.ID newStateID)
         {
+            if (!EnsureInitialized())
+            {
+                return false;
+            }
+
             var entityData = _entityData;
             entityData.ChangeState(newStateID);
             _entityData = entityData;
-            
-            OnStateChanged?.Invoke(newStateID);
+
+            StateChanged?.Invoke(newStateID);
             return true;
         }
         
@@ -200,6 +197,10 @@ namespace Lineage.Components
         /// </summary>
         public State GetCurrentState()
         {
+            if (!EnsureInitialized())
+            {
+                return default;
+            }
             return _entityData.currentState;
         }
         
@@ -208,6 +209,10 @@ namespace Lineage.Components
         /// </summary>
         public List<State> GetAvailableStates()
         {
+            if (!EnsureInitialized())
+            {
+                return new List<State>();
+            }
             return _entityData.availableStates ?? new List<State>();
         }
         
@@ -220,6 +225,17 @@ namespace Lineage.Components
         /// </summary>
         public void ApplyBuff(Buff buff)
         {
+            if (buff == null)
+            {
+                Log.Warning("Attempted to apply a null buff", Log.LogCategory.General, this);
+                return;
+            }
+
+            if (!EnsureInitialized())
+            {
+                return;
+            }
+
             var entityData = _entityData;
             entityData.ApplyBuff(buff);
             _entityData = entityData;
@@ -230,6 +246,11 @@ namespace Lineage.Components
         /// </summary>
         public void RemoveBuff(int buffID)
         {
+            if (!EnsureInitialized())
+            {
+                return;
+            }
+
             var entityData = _entityData;
             entityData.RemoveBuff(buffID);
             _entityData = entityData;
@@ -240,6 +261,10 @@ namespace Lineage.Components
         /// </summary>
         public List<Buff> GetActiveBuffs()
         {
+            if (!EnsureInitialized())
+            {
+                return new List<Buff>();
+            }
             return _entityData.activeBuffs ?? new List<Buff>();
         }
         
@@ -252,7 +277,12 @@ namespace Lineage.Components
         /// </summary>
         public float GetCombatPower()
         {
-            return (_entityData.attack.currentValue + _entityData.defense.currentValue + 
+            if (!EnsureInitialized())
+            {
+                return 0f;
+            }
+
+            return (_entityData.attack.currentValue + _entityData.defense.currentValue +
                    _entityData.strength.currentValue + _entityData.agility.currentValue) / 4f;
         }
         
@@ -261,7 +291,12 @@ namespace Lineage.Components
         /// </summary>
         public float GetSocialPower()
         {
-            return (_entityData.charisma.currentValue + _entityData.intelligence.currentValue + 
+            if (!EnsureInitialized())
+            {
+                return 0f;
+            }
+
+            return (_entityData.charisma.currentValue + _entityData.intelligence.currentValue +
                    _entityData.luck.currentValue) / 3f;
         }
         
@@ -270,6 +305,11 @@ namespace Lineage.Components
         /// </summary>
         public int GetAge()
         {
+            if (!EnsureInitialized())
+            {
+                return 0;
+            }
+
             // This would need to be implemented based on your age system
             // For now, return a placeholder
             return _entityData.level * 5; // Rough approximation
@@ -280,6 +320,11 @@ namespace Lineage.Components
         /// </summary>
         public bool IsHealthy()
         {
+            if (!EnsureInitialized())
+            {
+                return false;
+            }
+
             return _entityData.isAlive && _entityData.health.current > (_entityData.health.max * 0.5f);
         }
         
@@ -299,13 +344,23 @@ namespace Lineage.Components
         /// </summary>
         public void UpdateNeeds(float deltaTime)
         {
-            if (!enableNeedsDecay) return;
-            
+            if (!enableNeedsDecay || deltaTime <= 0f) return;
+
+            if (!EnsureInitialized())
+            {
+                return;
+            }
+
             // Apply decay rates to needs
             ModifyStat(Stat.ID.Hunger, -hungerDecayRate * deltaTime);
             ModifyStat(Stat.ID.Thirst, -thirstDecayRate * deltaTime);
             ModifyStat(Stat.ID.Energy, -energyDecayRate * deltaTime);
             ModifyStat(Stat.ID.Rest, -restDecayRate * deltaTime);
+
+            if (HasCriticalNeeds())
+            {
+                CriticalNeeds?.Invoke();
+            }
         }
         
         /// <summary>
