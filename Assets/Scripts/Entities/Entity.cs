@@ -237,25 +237,16 @@ namespace Lineage.Entities
             if (entityID == 0) return;
 
             // Prefer new ScriptableObject based GameData if available
-            var entityDef = GameDataManager.Instance.GetDefinition<EntityDefinitionSO>(entityID.ToString());
+            var entityDef = GameDataManager.Instance.GetEntityDefinition(entityID.ToString());
             if (entityDef != null)
             {
                 UnityEngine.Debug.Log($"Loaded entity definition {entityDef.displayName} via GameDataManager");
-                // TODO: map fields from EntityDefinitionSO to EntityData struct
+                _entityData = new Database.Entity(entityDef.displayName, (Database.Entity.ID)entityID, description: entityDef.description);
+                SyncSerializedFields();
                 return;
             }
 
-            var entityFromDB = GameData.GetEntityByID(entityID);
-            if (entityFromDB.entityID != 0)
-            {
-                EntityData = entityFromDB;
-                SyncSerializedFields();
-                UnityEngine.Debug.Log($"Loaded entity data for ID {entityID}: {EntityData.entityName}");
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning($"Entity with ID {entityID} not found in database");
-            }
+            UnityEngine.Debug.LogWarning($"Entity definition for ID {entityID} not found in GameData");
         }
           private void SyncSerializedFields()
         {
