@@ -962,6 +962,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2634568374021002244, guid: a896f0c86999b5d43846408b16270ccb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1610902315}
+    - targetCorrespondingSourceObject: {fileID: 2634568374021002244, guid: a896f0c86999b5d43846408b16270ccb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1610902316}
   m_SourcePrefab: {fileID: 100100000, guid: a896f0c86999b5d43846408b16270ccb, type: 3}
 --- !u!1 &575337098
 GameObject:
@@ -1336,6 +1339,7 @@ GameObject:
   - component: {fileID: 887311108}
   - component: {fileID: 887311112}
   - component: {fileID: 887311111}
+  - component: {fileID: 887311113}
   m_Layer: 0
   m_Name: resourceNode_redBerryBush
   m_TagString: Untagged
@@ -1464,6 +1468,25 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &887311113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887311107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee2f41e3cf933548bd06aee454cb04d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: 0
+  maxResourceAmount: 100
+  currentResourceAmount: 100
+  regenerationRate: 5
+  harvestRate: 10
+  spriteRenderer: {fileID: 0}
+  depletedColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &902106101
 GameObject:
   m_ObjectHideFlags: 0
@@ -1822,6 +1845,7 @@ GameObject:
   - component: {fileID: 1135522399}
   - component: {fileID: 1135522401}
   - component: {fileID: 1135522400}
+  - component: {fileID: 1135522402}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -1877,6 +1901,33 @@ MonoBehaviour:
       UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$version":"A"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences:
     - {fileID: 51313330}
+--- !u!114 &1135522402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135522398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b7b4a6b79cb3424f855686db90c0806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  foodText: {fileID: 0}
+  faithText: {fileID: 0}
+  woodText: {fileID: 0}
+  populationText: {fileID: 0}
+  dayText: {fileID: 0}
+  seasonText: {fileID: 0}
+  timeText: {fileID: 0}
+  gameSpeedText: {fileID: 0}
+  pauseButton: {fileID: 0}
+  speed1Button: {fileID: 0}
+  speed2Button: {fileID: 0}
+  speed3Button: {fileID: 0}
+  selectionPanel: {fileID: 0}
+  selectedPopName: {fileID: 0}
+  selectedPopStats: {fileID: 0}
 --- !u!1 &1170282811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1916,6 +1967,7 @@ Transform:
   - {fileID: 207500826}
   - {fileID: 1135522399}
   - {fileID: 54986929}
+  - {fileID: 1361006898}
   m_Father: {fileID: 870645098}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1275393766
@@ -2345,6 +2397,53 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 33f1647fb80a7e24b9970f4782fd019b, type: 2}
   m_BuildHeightMesh: 1
+--- !u!1 &1361006897
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1361006898}
+  - component: {fileID: 1361006899}
+  m_Layer: 0
+  m_Name: MenuButtonHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1361006898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361006897}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.5999994, y: -0.46916008, z: 19.41}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1170282812}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1361006899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361006897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2c9c28a71bf22342b9857a043a64f13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnPopButton: {fileID: 0}
+  improveShelterButton: {fileID: 0}
+  researchButton: {fileID: 0}
 --- !u!225 &1381145817
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2762,6 +2861,25 @@ MonoBehaviour:
     _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
     _objectReferences:
     - {fileID: 11400000, guid: a8698ac3e67ad4e4f96af2f7b01137c4, type: 2}
+--- !u!114 &1610902316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1610902297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 955e5f7ebafbf3e428f0917c3f2a30d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableAI: 1
+  decisionInterval: 2
+  wanderRadius: 5
+  gatherRange: 1.5
+  gatherDuration: 3
+  hungerThreshold: 50
+  thirstThreshold: 50
 --- !u!1 &1683605577
 GameObject:
   m_ObjectHideFlags: 0
@@ -3784,9 +3902,10 @@ GameObject:
   - component: {fileID: 1821508337}
   - component: {fileID: 1821508336}
   - component: {fileID: 1821508335}
+  - component: {fileID: 1821508339}
   m_Layer: 0
   m_Name: resourceNode_redBerryBush (1)
-  m_TagString: Untagged
+  m_TagString: ResourceNode
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3912,6 +4031,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1821508339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821508333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee2f41e3cf933548bd06aee454cb04d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: 0
+  maxResourceAmount: 100
+  currentResourceAmount: 100
+  regenerationRate: 5
+  harvestRate: 10
+  spriteRenderer: {fileID: 0}
+  depletedColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
 --- !u!1 &1979366218
 GameObject:
   m_ObjectHideFlags: 0

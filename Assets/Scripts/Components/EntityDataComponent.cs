@@ -1,8 +1,6 @@
-
 using UnityEngine;
 using System.Collections.Generic;
 using Lineage.Database;
-using UnityEditor.EditorTools;
 using Lineage.Debug;
 
 namespace Lineage.Components
@@ -366,6 +364,62 @@ namespace Lineage.Components
         public bool HasCriticalNeeds()
         {
             return GetHunger() <= 0f || GetThirst() <= 0f;
+        }
+
+        /// <summary>
+        /// Sets the base value of a stat. Use this for initial setup rather than ModifyStat.
+        /// </summary>
+        /// <param name="statID">The stat to set.</param>
+        /// <param name="value">The new base value.</param>
+        public void SetBaseStat(Stat.ID statID, float value)
+        {
+            var entityData = _entityData;
+            
+            switch (statID)
+            {
+                case Stat.ID.Health:
+                    entityData.health = new Health(value, value);
+                    break;
+                case Stat.ID.Mana:
+                    entityData.mana = new Stat(statID, "Mana", value);
+                    break;
+                case Stat.ID.Stamina:
+                    entityData.stamina = new Stat(statID, "Stamina", value);
+                    break;
+                case Stat.ID.Strength:
+                    entityData.strength = new Stat(statID, "Strength", value);
+                    break;
+                case Stat.ID.Agility:
+                    entityData.agility = new Stat(statID, "Agility", value);
+                    break;
+                case Stat.ID.Intelligence:
+                    entityData.intelligence = new Stat(statID, "Intelligence", value);
+                    break;
+                case Stat.ID.Defense:
+                    entityData.defense = new Stat(statID, "Defense", value);
+                    break;
+                case Stat.ID.Speed:
+                    entityData.speed = new Stat(statID, "Speed", value);
+                    break;
+                case Stat.ID.Attack:
+                    entityData.attack = new Stat(statID, "Attack", value);
+                    break;
+                case Stat.ID.Hunger:
+                    entityData.hunger = new Stat(statID, "Hunger", value);
+                    break;
+                case Stat.ID.Thirst:
+                    entityData.thirst = new Stat(statID, "Thirst", value);
+                    break;
+                case Stat.ID.Energy:
+                    entityData.energy = new Stat(statID, "Energy", value);
+                    break;
+                default:
+                    Log.Warning($"Cannot set base stat for {statID}", Log.LogCategory.General, this);
+                    break;
+            }
+            
+            _entityData = entityData;
+            OnStatChanged?.Invoke(statID, value);
         }
         
         #endregion

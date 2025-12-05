@@ -221,10 +221,20 @@ namespace Lineage.UI
 
         private void SetupLayoutGroup()
         {
+            // Ensure we have a valid gameObject
+            if (gameObject == null) return;
+
             // Remove existing layout group
             if (layoutGroup != null)
             {
-                DestroyImmediate(layoutGroup);
+                #if UNITY_EDITOR
+                if (Application.isPlaying)
+                    Destroy(layoutGroup);
+                else
+                    DestroyImmediate(layoutGroup);
+                #else
+                Destroy(layoutGroup);
+                #endif
             }
 
             switch (groupType)
@@ -294,6 +304,7 @@ namespace Lineage.UI
 
         private void SetLayoutPadding(HorizontalOrVerticalLayoutGroup layoutGroup)
         {
+            if (layoutGroup == null) return;
             layoutGroup.padding.left = (int)containerPadding.left;
             layoutGroup.padding.right = (int)containerPadding.right;
             layoutGroup.padding.top = (int)containerPadding.top;
@@ -302,6 +313,7 @@ namespace Lineage.UI
 
         private void SetLayoutPadding(GridLayoutGroup layoutGroup)
         {
+            if (layoutGroup == null) return;
             layoutGroup.padding.left = (int)containerPadding.left;
             layoutGroup.padding.right = (int)containerPadding.right;
             layoutGroup.padding.top = (int)containerPadding.top;

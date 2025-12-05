@@ -6,6 +6,7 @@ TagManager:
   tags:
   - entities
   - Targets
+  - ResourceNode
   layers:
   - Default
   - TransparentFX

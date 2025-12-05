@@ -141,7 +141,7 @@ namespace Lineage.Managers
 
         private void OnRightClick(InputAction.CallbackContext context)
         {
-            if (selectedPops.Count > 0)
+            if (selectedPops.Count > 0 && mainCamera != null)
             {
                 // Get the destination from mouse position
                 Vector3 mousePos = pointAction != null ?
@@ -154,6 +154,8 @@ namespace Lineage.Managers
                     // Tell selected pops to move to this position
                     foreach (GameObject pop in selectedPops)
                     {
+                        if (pop == null) continue;
+                        
                         PopController controller = pop.GetComponent<PopController>();
                         if (controller != null)
                         {
@@ -222,36 +224,42 @@ namespace Lineage.Managers
                 Mathf.Abs(currentMousePos.y - startDragPos.y)
             );
 
-            // Find all pops within the selection rectangle
-            GameObject[] allPops = GameObject.FindGameObjectsWithTag("Pop");
-            foreach (GameObject pop in allPops)
+            // Use PopulationManager's cached list instead of expensive FindGameObjectsWithTag
+            if (PopulationManager.Instance != null)
             {
-                Vector2 screenPos = mainCamera.WorldToScreenPoint(pop.transform.position);
-                if (selectionRect.Contains(screenPos))
+                var allPops = PopulationManager.Instance.GetLivingPops();
+                foreach (var pop in allPops)
                 {
-                    AddToSelection(pop);
+                    if (pop == null) continue;
+                    Vector2 screenPos = mainCamera.WorldToScreenPoint(pop.transform.position);
+                    if (selectionRect.Contains(screenPos))
+                    {
+                        AddToSelection(pop.gameObject);
+                    }
                 }
             }
         }
 
         private void HandleSingleClick()
         {
-            if (pointAction == null) return;
+            if (pointAction == null || mainCamera == null) return;
 
             Vector2 clickPos = pointAction.ReadValue<Vector2>();
             Ray ray = mainCamera.ScreenPointToRay(clickPos);
 
+            bool shiftPressed = Keyboard.current != null && Keyboard.current.shiftKey.isPressed;
+
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, popLayerMask))
             {
                 // If not holding shift, clear previous selection
-                if (!Keyboard.current.shiftKey.isPressed)
+                if (!shiftPressed)
                 {
                     ClearSelection();
                 }
 
                 AddToSelection(hit.collider.gameObject);
             }
-            else if (!Keyboard.current.shiftKey.isPressed)
+            else if (!shiftPressed)
             {
                 // Clicked on nothing while not holding shift - clear selection
                 ClearSelection();

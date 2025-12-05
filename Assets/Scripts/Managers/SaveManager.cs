@@ -338,7 +338,7 @@ namespace Lineage.Managers
                 var existingPops = FindObjectsByType<Entities.Pop>(FindObjectsSortMode.None);
                 foreach (var pop in existingPops)
                 {
-                    DestroyImmediate(pop.gameObject);
+                    Destroy(pop.gameObject);
                 }
 
                 // Restore population

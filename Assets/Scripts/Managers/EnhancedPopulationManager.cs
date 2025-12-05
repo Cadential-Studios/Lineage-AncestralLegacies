@@ -250,27 +250,93 @@ namespace Lineage.Managers
             }
         }
 
-        //TODO: Transition this to a universal EntityData-based spawner.
+        /// <summary>
+        /// Spawns a new Pop entity using either the GameData system or basic instantiation.
+        /// </summary>
         public void SpawnPop()
         {
             if (currentPopulation >= populationCap || popPrefab == null) return;
 
-            Vector3 spawnPos = spawnPoint.position + Random.insideUnitSphere * spawnRadius;
-            spawnPos.y = spawnPoint.position.y;
+            Vector3 spawnPos = spawnPoint != null 
+                ? spawnPoint.position + Random.insideUnitSphere * spawnRadius 
+                : Vector3.zero + Random.insideUnitSphere * spawnRadius;
+            spawnPos.y = spawnPoint != null ? spawnPoint.position.y : 0f;
 
-            GameObject popObj;
+            GameObject popObj = Instantiate(popPrefab, spawnPos, Quaternion.identity);
+            Pop pop = popObj.GetComponent<Pop>();
+
+            if (pop == null)
+            {
+                Log.Error($"PopPrefab is missing Pop component!", Log.LogCategory.Population);
+                Destroy(popObj);
+                return;
+            }
+
+            pop.name = GenerateRandomName();
 
             if (useGameDataSystem)
             {
-                //TODO: Implement GameData-based pop creation
-            }
-            else
-            {
-                // Fallback to simple instantiation
-                popObj = Instantiate(popPrefab, spawnPos, Quaternion.identity);
+                // Apply GameData-based configuration
+                var entityComponent = pop.GetComponent<EntityDataComponent>();
+                if (entityComponent == null)
+                {
+                    entityComponent = popObj.AddComponent<EntityDataComponent>();
+                }
+
+                // Try to get entity definition from GameDataManager
+                var entityDef = GameDataBridge.TryGetEntityDefinition("ENTITY_POP_GENERIC");
+                if (entityDef != null)
+                {
+                    // Apply definition stats to the entity data component
+                    InitializeEntityFromDefinition(entityComponent, entityDef);
+                }
+
+                // Apply random traits if enabled
+                if (enableRandomTraits)
+                {
+                    ApplyRandomTraits(entityComponent);
+                }
+
+                entityComponents.Add(entityComponent);
             }
 
+            livingPops.Add(pop);
+            currentPopulation++;
+            OnPopulationChanged?.Invoke(currentPopulation);
+            Log.Info($"New pop spawned: {pop.name}", Log.LogCategory.Population);
         }
+
+        /// <summary>
+        /// Initializes an EntityDataComponent from an EntityDefinitionSO.
+        /// </summary>
+        private void InitializeEntityFromDefinition(EntityDataComponent component, Core.Entities.EntityDefinitionSO definition)
+        {
+            if (component == null || definition == null) return;
+
+            // Initialize base stats from definition
+            component.SetBaseStat(Stat.ID.Health, definition.baseHealth);
+            component.SetBaseStat(Stat.ID.Mana, definition.baseMana);
+            component.SetBaseStat(Stat.ID.Speed, definition.baseSpeed);
+            component.SetBaseStat(Stat.ID.Strength, definition.baseStrength);
+            component.SetBaseStat(Stat.ID.Agility, definition.baseAgility);
+            component.SetBaseStat(Stat.ID.Intelligence, definition.baseIntelligence);
+            component.SetBaseStat(Stat.ID.Defense, definition.baseDefense);
+        }
+
+        /// <summary>
+        /// Applies random traits to an entity for variety.
+        /// </summary>
+        private void ApplyRandomTraits(EntityDataComponent component)
+        {
+            if (component == null) return;
+
+            // Random stat variance (+/- 20%)
+            float variance = Random.Range(0.8f, 1.2f);
+            component.ModifyStat(Stat.ID.Health, component.GetStat(Stat.ID.Health).currentValue * (variance - 1f));
+            component.ModifyStat(Stat.ID.Strength, component.GetStat(Stat.ID.Strength).currentValue * (variance - 1f));
+            component.ModifyStat(Stat.ID.Speed, component.GetStat(Stat.ID.Speed).currentValue * (variance - 1f));
+        }
+
         private Database.Entity GetEntityDataForPop(Pop pop)
         {
             var entityComponent = pop.GetComponent<EntityDataComponent>();

@@ -5,12 +5,10 @@ using Lineage.Core.Items;
 namespace Lineage.Core.Crafting
 {
     /// <summary>
-    /// Definition for a crafting recipe.
+    /// ScriptableObject representing a crafting recipe definition.
+    /// Contains ingredients, output item, quantity, and crafting time.
     /// </summary>
     [CreateAssetMenu(fileName = "NewRecipeDef", menuName = "GameData/Recipes/Recipe Definition")]
-    /// <summary>
-    /// ScriptableObject representing a crafting recipe definition.
-    /// </summary>
     public class RecipeDefinitionSO : Lineage.Core.GameDataSO
     {
         /// <summary>
