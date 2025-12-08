@@ -1,0 +1,26 @@
+{
+    "name": "LineageScripts.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "LineageScripts",
+        "Lineage.Core.Utilities",
+        "Lineage.Logic",
+        "LineageBehavior",
+        "Unity.InputSystem",
+        "Unity.AI.Navigation",
+        "Cinemachine",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

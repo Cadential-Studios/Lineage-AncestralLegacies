@@ -12,7 +12,7 @@ namespace Lineage.Behavior
     {
         protected override Status OnStart()
         {
-            Debug.Log.Debug("Test Action Started");
+            UnityEngine.Debug.Log("Test Action Started");
             return Status.Success;
         }
 
@@ -23,7 +23,7 @@ namespace Lineage.Behavior
 
         protected override void OnEnd()
         {
-            Debug.Log.Debug("Test Action Ended");
+            UnityEngine.Debug.Log("Test Action Ended");
         }
     }
 }

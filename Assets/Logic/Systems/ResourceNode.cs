@@ -1,6 +1,8 @@
 using UnityEngine;
 using Lineage.Managers;
 
+#pragma warning disable CS0414 // Field is assigned but its value is never used
+
 namespace Lineage.Systems.ResourceNodes
 {
     /// <summary>
@@ -14,7 +16,7 @@ namespace Lineage.Systems.ResourceNodes
         [SerializeField] private float currentResourceAmount = 100f;
         [SerializeField] private float regenerationRate = 5f; // Per second
         [SerializeField] private float harvestRate = 10f; // Per second when being harvested
-        
+
         [Header("Visual Feedback")]
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Color depletedColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);

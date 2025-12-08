@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.AI;
 using Lineage.Entities;
 using Lineage.Managers;
-using Lineage.Debug;
 using Lineage.Systems.ResourceNodes;
+
+#pragma warning disable CS0414 // Field is assigned but its value is never used
 
 namespace Lineage.AI
 {
@@ -136,7 +137,7 @@ namespace Lineage.AI
             if (currentTarget == null)
             {
                 currentTarget = FindNearestFoodSource();
-                
+
                 if (currentTarget != null)
                 {
                     agent.SetDestination(currentTarget.transform.position);
@@ -186,7 +187,7 @@ namespace Lineage.AI
             while (gatherTime < gatherDuration && currentTarget != null)
             {
                 gatherTime += Time.deltaTime;
-                
+
                 // Gather food incrementally
                 if (ResourceManager.Instance != null)
                 {
@@ -222,7 +223,7 @@ namespace Lineage.AI
         {
             // Find all resource nodes tagged appropriately
             GameObject[] foodSources = GameObject.FindGameObjectsWithTag("ResourceNode");
-            
+
             if (foodSources.Length == 0)
             {
                 // Fallback: find any objects with "berry" in name
